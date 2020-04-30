@@ -1,9 +1,15 @@
 use amethyst::{
-    core::{Transform, SystemDesc}, derive::SystemDesc,
+    assets::AssetStorage,
+    audio::{output::Output, Source},
+    core::{SystemDesc, Transform},
+    derive::SystemDesc,
     ecs::prelude::*,
 };
 
-use crate::pong::{Ball,Side,Paddle,ARENA_HEIGHT};
+use crate::{
+    audio::Sounds,
+    pong::{Ball, Paddle, Side, ARENA_HEIGHT},
+};
 
 #[derive(SystemDesc)]
 pub struct BounceSystem;
@@ -13,9 +19,15 @@ impl<'s> System<'s> for BounceSystem {
         WriteStorage<'s, Ball>,
         WriteStorage<'s, Paddle>,
         ReadStorage<'s, Transform>,
+        Read<'s, AssetStorage<Source>>,
+        ReadExpect<'s, Sounds>,
+        Option<Read<'s, Output>>,
     );
 
-    fn run(&mut self, (mut balls, paddles, transforms): Self::SystemData) {
+    fn run(
+        &mut self,
+        (mut balls, paddles, transforms, sound_storage, sounds, audio_output): Self::SystemData,
+    ) {
         for (ball, transform) in (&mut balls, &transforms).join() {
             let ball_x = transform.translation().x;
             let ball_y = transform.translation().y;
@@ -23,8 +35,11 @@ impl<'s> System<'s> for BounceSystem {
             if (ball_y <= ball.radius && ball.velocity[1] < 0.0)
                 || (ball_y >= ARENA_HEIGHT - ball.radius && ball.velocity[1] > 0.0)
             {
-                dbg!(("bounce 1", ball_x, ball_y, ball.velocity));
                 ball.velocity[1] *= -1.0;
+                sounds.play_bounce(
+                    &sound_storage,
+                    audio_output.as_ref().map(|o| &**o),
+                );
             }
 
             for (paddle, paddle_transform) in (&paddles, &transforms).join() {
@@ -42,8 +57,11 @@ impl<'s> System<'s> for BounceSystem {
                     if (paddle.side == Side::Left && ball.velocity[0] < 0.0)
                         || (paddle.side == Side::Right && ball.velocity[0] > 0.0)
                     {
-                        dbg!(("bounce 2", ball_x, ball_y, ball.velocity, paddle_x, paddle_y));
                         ball.velocity[0] *= -1.0;
+                        sounds.play_bounce(
+                            &sound_storage,
+                            audio_output.as_ref().map(|o| &**o),
+                        );
                     }
                 }
             }
