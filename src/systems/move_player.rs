@@ -37,13 +37,8 @@ impl<'s> System<'s> for MovePlayerSystem {
                     .contacts_with(handle.0, true)
                     .into_iter()
                     .flat_map(|v| v)
-                    .filter_map(|(_h1, _h2, _algo, manifold)| {
-                        manifold.contacts().find(|c| {
-                            c.contact.normal.as_ref().dot(&movement_vector) != 0.0
-                                && c.contact.world1.coords.x.signum() == -scaled_amount.signum()
-                        })
-                    })
-                    .next();
+                    .filter_map(|(_h1, _h2, _algo, manifold)| manifold.deepest_contact())
+                    .find(|c| c.contact.normal.as_ref().x.signum() == scaled_amount.signum());
                 if scaled_amount != 0.0 {
                     eprintln!(
                         "contacts: {:#?}",
