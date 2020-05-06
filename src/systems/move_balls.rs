@@ -1,8 +1,10 @@
 use amethyst::{
-    core::timing::Time, core::SystemDesc, core::Transform, derive::SystemDesc, ecs::prelude::*,
+    core::{timing::Time, SystemDesc, Transform},
+    derive::SystemDesc,
+    ecs::prelude::*,
 };
 
-use crate::pong::Ball;
+use crate::game::Ball;
 
 #[derive(SystemDesc)]
 pub struct MoveBallsSystem;

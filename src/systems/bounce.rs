@@ -8,7 +8,7 @@ use amethyst::{
 
 use crate::{
     audio::Sounds,
-    pong::{Ball, Paddle, Side, ARENA_HEIGHT},
+    game::{Ball, Paddle, Side, ARENA_HEIGHT},
 };
 
 #[derive(SystemDesc)]
@@ -36,10 +36,7 @@ impl<'s> System<'s> for BounceSystem {
                 || (ball_y >= ARENA_HEIGHT - ball.radius && ball.velocity[1] > 0.0)
             {
                 ball.velocity[1] *= -1.0;
-                sounds.play_bounce(
-                    &sound_storage,
-                    audio_output.as_ref().map(|o| &**o),
-                );
+                sounds.play_bounce(&sound_storage, audio_output.as_ref().map(|o| &**o));
             }
 
             for (paddle, paddle_transform) in (&paddles, &transforms).join() {
@@ -58,10 +55,7 @@ impl<'s> System<'s> for BounceSystem {
                         || (paddle.side == Side::Right && ball.velocity[0] > 0.0)
                     {
                         ball.velocity[0] *= -1.0;
-                        sounds.play_bounce(
-                            &sound_storage,
-                            audio_output.as_ref().map(|o| &**o),
-                        );
+                        sounds.play_bounce(&sound_storage, audio_output.as_ref().map(|o| &**o));
                     }
                 }
             }

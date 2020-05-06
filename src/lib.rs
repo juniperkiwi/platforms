@@ -1,3 +1,4 @@
+#![allow(dead_code, unused_imports, unused_variables)]
 use amethyst::{
     audio::{AudioBundle, DjSystemDesc},
     core::transform::TransformBundle,
@@ -11,12 +12,16 @@ use amethyst::{
     ui::{RenderUi, UiBundle},
     utils::application_root_dir,
 };
+use amethyst_nphysics::NPhysicsBackend;
+use amethyst_physics::PhysicsBundle;
 
 mod audio;
-mod pong;
+mod collisions;
+mod game;
 mod systems;
+mod world;
 
-use crate::{audio::Music, pong::Pong};
+use crate::{audio::Music, game::Game};
 
 pub fn run() -> amethyst::Result<()> {
     let app_root = application_root_dir()?;
@@ -39,23 +44,46 @@ pub fn run() -> amethyst::Result<()> {
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
         .with_bundle(UiBundle::<StringBindings>::new())?
-        .with_bundle(AudioBundle::default())?
-        .with(systems::PaddleSystem, "paddle_system", &["input_system"])
-        .with(systems::MoveBallsSystem, "ball_system", &[])
+        // .with_bundle(AudioBundle::default())?
+        .with_bundle(PhysicsBundle::<f32, NPhysicsBackend>::new())?
+        // .with(systems::PaddleSystem, "paddle_system", &["input_system"])
+        // .with(systems::MoveBallsSystem, "ball_system", &[])
+        // .with(
+        //     systems::BounceSystem,
+        //     "collision_system",
+        //     &["paddle_system", "ball_system"],
+        // )
+        // .with(systems::WinnerSystem, "winner_system", &["ball_system"])
+        // .with_system_desc(
+        //     DjSystemDesc::new(|music: &mut Music| music.music.next()),
+        //     "dj_system",
+        //     &[],
+        // )
         .with(
-            systems::BounceSystem,
-            "collision_system",
-            &["paddle_system", "ball_system"],
-        )
-        .with(systems::WinnerSystem, "winner_system", &["ball_system"])
-        .with_system_desc(
-            DjSystemDesc::new(|music: &mut Music| music.music.next()),
-            "dj_system",
+            systems::Ncollide2dSyncPresencesSystem::default(),
+            "ncollide2d_sync_presence",
             &[],
-        );
+        )
+        .with(
+            systems::Ncollide2dSyncTransformsSystem::default(),
+            "ncollide2d_sync_transform",
+            &[],
+        )
+        .with(
+            systems::Ncollide2dUpdateWorldSystem::default(),
+            "ncollide2d_update_world",
+            &["ncollide2d_sync_presence", "ncollide2d_sync_transform"]
+        )
+        .with(
+            systems::MovePlayerSystem,
+            "move_player",
+            &["ncollide2d_update_world"]
+        )
+        // ; on newline
+        ;
 
     let assets_dir = app_root.join("assets");
-    let mut game = Application::new(assets_dir, Pong::default(), game_data)?;
+    let mut game = Application::new(assets_dir, Game::default(), game_data)?;
     game.run();
 
     Ok(())

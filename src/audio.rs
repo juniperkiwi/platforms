@@ -2,7 +2,7 @@ use std::{iter::Cycle, vec::IntoIter};
 
 use amethyst::{
     assets::{AssetStorage, Loader},
-    audio::{output::Output, OggFormat, Source, SourceHandle, AudioSink},
+    audio::{output::Output, AudioSink, OggFormat, Source, SourceHandle},
     ecs::{World, WorldExt},
 };
 
@@ -49,19 +49,19 @@ pub fn initialize_audio(world: &mut World) {
 
 impl Sounds {
     pub fn play_bounce(&self, storage: &AssetStorage<Source>, output: Option<&Output>) {
-        if let Some(output) = output {
-            if let Some(sound) = storage.get(&self.bounce_sfx) {
-                output.play_once(sound, 1.0);
-            }
-        }
+        // if let Some(output) = output {
+        //     if let Some(sound) = storage.get(&self.bounce_sfx) {
+        //         output.play_once(sound, 1.0);
+        //     }
+        // }
     }
 
     pub fn play_score(&self, storage: &AssetStorage<Source>, output: Option<&Output>) {
-        if let Some(output) = output {
-            if let Some(sound) = storage.get(&self.score_sfx) {
-                output.play_once(sound, 1.0);
-            }
-        }
+        // if let Some(output) = output {
+        //     if let Some(sound) = storage.get(&self.score_sfx) {
+        //         output.play_once(sound, 1.0);
+        //     }
+        // }
     }
 }
 

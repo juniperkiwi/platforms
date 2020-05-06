@@ -1,0 +1,9 @@
+#![enable(implicit_some)]
+Grid((
+    texture_width: 135,
+    texture_height: 67,
+    columns: 8,
+    sprite_count: 28,
+    cell_size: (16, 16),
+    position: (1, 1),
+))

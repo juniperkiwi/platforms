@@ -1,8 +1,7 @@
 use amethyst::{
     assets::AssetStorage,
     audio::{output::Output, Source},
-    core::transform::Transform,
-    core::SystemDesc,
+    core::{transform::Transform, SystemDesc},
     derive::SystemDesc,
     ecs::prelude::*,
     ui::UiText,
@@ -10,7 +9,7 @@ use amethyst::{
 
 use crate::{
     audio::Sounds,
-    pong::{Ball, ScoreText, Scoreboard, ARENA_WIDTH},
+    game::{Ball, ScoreText, Scoreboard, ARENA_WIDTH},
 };
 
 #[derive(SystemDesc)]

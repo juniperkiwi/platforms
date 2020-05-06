@@ -1,7 +1,7 @@
 fn main() {
     amethyst::start_logger(Default::default());
 
-    match pong::run() {
+    match platforms::run() {
         Ok(()) => (),
         Err(e) => {
             eprintln!("Error: {}", e);

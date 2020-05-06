@@ -1,5 +1,5 @@
 [package]
-name = "pong"
+name = "platforms"
 version = "0.1.0"
 authors = ["David Ross <daboross@daboross.net>"]
 edition = "2018"
@@ -8,3 +8,12 @@ edition = "2018"
 
 [dependencies]
 amethyst = { version = "0.15", features = ["vulkan"] }
+amethyst_physics = { version = "0.2.0", git = "https://github.com/juniperkiwi/amethyst_physics.git" }
+amethyst_nphysics = { version = "0.2.0", git = "https://github.com/juniperkiwi/amethyst_nphysics.git" }
+nalgebra = "0.19"
+ncollide2d = "0.21"
+hibitset = "0.6.3"
+alga = "0.9.3"
+
+[profile.dev]
+incremental = true

@@ -1,4 +1,4 @@
 (
-    title: "Pong",
-    dimensions: Some((500, 500))
+    title: "Platforms",
+    dimensions: Some((640, 480))
 )
