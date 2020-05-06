@@ -7,8 +7,7 @@ use amethyst::{
     ui::{Anchor, TtfFormat, UiText, UiTransform},
 };
 
-use crate::audio::initialize_audio;
-use crate::world;
+use crate::{audio::initialize_audio, world};
 
 pub const ARENA_HEIGHT: f32 = 100.0;
 pub const ARENA_WIDTH: f32 = 100.0;
@@ -65,11 +64,7 @@ pub fn initialize_platforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>
         .iter()
         .for_each(|&arr| {
             world::create_platform(world)
-                .with(
-                    Transform::default()
-                        .append_translation(arr.into())
-                        .clone(),
-                )
+                .with(Transform::default().append_translation(arr.into()).clone())
                 .with(sprite_render.clone())
                 .build();
         });

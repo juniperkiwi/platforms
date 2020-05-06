@@ -5,9 +5,11 @@ use amethyst::{
     input::{InputHandler, StringBindings},
 };
 
-use crate::collisions::*;
-use crate::game::{Paddle, Side, ARENA_HEIGHT, PADDLE_HEIGHT, PADDLE_VELOCITY};
-use crate::world::*;
+use crate::{
+    collisions::*,
+    game::{Paddle, Side, ARENA_HEIGHT, PADDLE_HEIGHT, PADDLE_VELOCITY},
+    world::*,
+};
 use nalgebra::{Vector2, Vector3};
 
 #[derive(SystemDesc)]

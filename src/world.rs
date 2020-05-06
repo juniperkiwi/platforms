@@ -20,8 +20,7 @@ use ncollide2d::{
         world::CollisionWorld,
         CollisionGroups, GeometricQueryType,
     },
-    shape::Cuboid,
-    shape::ShapeHandle,
+    shape::{Cuboid, ShapeHandle},
 };
 use std::collections::BTreeMap;
 
