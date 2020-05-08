@@ -32,14 +32,7 @@ fn initialize_camera(world: &mut World) {
         .build();
 }
 
-pub fn initialize_platforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
-    let sprite_render = SpriteRender {
-        sprite_sheet,
-        sprite_number: 3,
-    };
-
-    world.register::<world::Platform>();
-
+fn initialize_box(world: &mut World, sprite_render: SpriteRender) {
     (0..20).for_each(|i| {
         world::create_platform(world)
             .with(
@@ -80,6 +73,28 @@ pub fn initialize_platforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>
             .with(sprite_render.clone())
             .build();
     });
+}
+
+fn initialize_single(world: &mut World, sprite_render: SpriteRender) {
+    world::create_platform(world)
+        .with(
+            Transform::default()
+                .append_translation([40.0, 20.0, 0.0].into())
+                .clone(),
+        )
+        .with(sprite_render.clone())
+        .build();
+}
+
+pub fn initialize_platforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
+    let sprite_render = SpriteRender {
+        sprite_sheet,
+        sprite_number: 3,
+    };
+
+    world.register::<world::Platform>();
+    // initialize_box(world, sprite_render);
+    initialize_single(world, sprite_render);
     // (1..9).for_each(|i| {
     //     world::create_platform(world)
     //         .with(

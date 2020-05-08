@@ -72,20 +72,23 @@ pub fn run() -> amethyst::Result<()> {
         .with(
             systems::Ncollide2dUpdateWorldSystem::default(),
             "ncollide2d_update_world",
-            &["ncollide2d_sync_presence", "ncollide2d_sync_transform"]
+            &["ncollide2d_sync_presence", "ncollide2d_sync_transform"],
         )
         .with(
             systems::MovePlayerSystem,
             "move_player",
-            &["ncollide2d_update_world"]
+            &["ncollide2d_update_world"],
         )
         .with(
             systems::GravitySystem,
             "gravity",
-            &["ncollide2d_update_world", "move_player"]
+            &["ncollide2d_update_world", "move_player"],
         )
-        // ; on newline
-        ;
+        .with(
+            systems::ApplyVelocity,
+            "apply_velocity",
+            &["ncollide2d_update_world", "move_player", "gravity"],
+        );
 
     let assets_dir = app_root.join("assets");
     let mut game = Application::new(assets_dir, Game::default(), game_data)?;
