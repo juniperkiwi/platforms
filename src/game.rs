@@ -40,16 +40,46 @@ pub fn initialize_platforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>
 
     world.register::<world::Platform>();
 
-    // (0..9).for_each(|i| {
-    //     world::create_platform(world)
-    //         .with(
-    //             Transform::default()
-    //                 .append_translation([i as f32 * 16.0, i as f32 * 16.0, 0.0].into())
-    //                 .clone(),
-    //         )
-    //         .with(sprite_render.clone())
-    //         .build();
-    // });
+    (0..20).for_each(|i| {
+        world::create_platform(world)
+            .with(
+                Transform::default()
+                    .append_translation([i as f32 * 16.0, 0.0, 0.0].into())
+                    .clone(),
+            )
+            .with(sprite_render.clone())
+            .build();
+    });
+    (0..20).for_each(|i| {
+        world::create_platform(world)
+            .with(
+                Transform::default()
+                    .append_translation([i as f32 * 16.0, 16.0 * 19.0, 0.0].into())
+                    .clone(),
+            )
+            .with(sprite_render.clone())
+            .build();
+    });
+    (0..20).for_each(|i| {
+        world::create_platform(world)
+            .with(
+                Transform::default()
+                    .append_translation([0.0, i as f32 * 16.0, 0.0].into())
+                    .clone(),
+            )
+            .with(sprite_render.clone())
+            .build();
+    });
+    (0..20).for_each(|i| {
+        world::create_platform(world)
+            .with(
+                Transform::default()
+                    .append_translation([16.0 * 19.0, i as f32 * 16.0, 0.0].into())
+                    .clone(),
+            )
+            .with(sprite_render.clone())
+            .build();
+    });
     // (1..9).for_each(|i| {
     //     world::create_platform(world)
     //         .with(
@@ -60,14 +90,14 @@ pub fn initialize_platforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>
     //         .with(sprite_render.clone())
     //         .build();
     // });
-    [[8.0, 16.0, 0.0], [48.0, 16.0, 0.0]]
-        .iter()
-        .for_each(|&arr| {
-            world::create_platform(world)
-                .with(Transform::default().append_translation(arr.into()).clone())
-                .with(sprite_render.clone())
-                .build();
-        });
+    // [[8.0, 16.0, 0.0], [48.0, 16.0, 0.0]]
+    //     .iter()
+    //     .for_each(|&arr| {
+    //         world::create_platform(world)
+    //             .with(Transform::default().append_translation(arr.into()).clone())
+    //             .with(sprite_render.clone())
+    //             .build();
+    //     });
 }
 
 fn initialize_player(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
@@ -81,7 +111,7 @@ fn initialize_player(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     world::create_player(world)
         .with(
             Transform::default()
-                .append_translation([24.0, 16.0, 0.0].into())
+                .append_translation([50.0, 50.0, 0.0].into())
                 .clone(),
         )
         .with(sprite_render.clone())

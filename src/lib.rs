@@ -79,6 +79,11 @@ pub fn run() -> amethyst::Result<()> {
             "move_player",
             &["ncollide2d_update_world"]
         )
+        .with(
+            systems::GravitySystem,
+            "gravity",
+            &["ncollide2d_update_world", "move_player"]
+        )
         // ; on newline
         ;
 

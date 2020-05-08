@@ -172,7 +172,10 @@ impl<'s> System<'s> for Ncollide2dSyncPresencesSystem {
         }
         // perform removes
         for (handle, _) in (&handles, &removed).join() {
-            world.objects.remove(handle.0);
+            // ncollide2d doesn't take advantage of being passed a list, and
+            // to give it a full one we'd have to collect into a vec, so let's
+            // not.
+            world.remove(&[handle.0]);
         }
     }
 
@@ -256,7 +259,10 @@ impl<'s> System<'s> for Ncollide2dSyncTransformsSystem {
         }
         // perform removes
         for (handle, _) in (&handles, &removed).join() {
-            world.objects.remove(handle.0);
+            // ncollide2d doesn't take advantage of being passed a list, and
+            // to give it a full one we'd have to collect into a vec, so let's
+            // not.
+            world.remove(&[handle.0]);
         }
     }
 
