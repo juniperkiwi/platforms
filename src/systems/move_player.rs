@@ -275,15 +275,23 @@ impl<'s> System<'s> for ApplyVelocity {
                 if remaining_time <= 0.0 || iterations_left == 0 || maximum_distance == 0.0 {
                     break;
                 }
-                let sweep = ncollide_world.sweep_test(
-                    &*presence.shape,
-                    &isometry,
-                    &direction,
-                    maximum_distance,
-                    &presence.collision_groups,
-                );
-                nearest = sweep
-                    .filter(|(_, toi)| toi.normal1.as_ref().dot(&direction) > 0.0)
+
+                let interferences =
+                    ncollide_world.interferences_with_aabb(&aabb, &presence.collision_groups);
+                nearest = interferences
+                    .filter_map(|(handle, x)| {
+                        ncollide2d::query::time_of_impact(
+                            &isometry,
+                            &direction,
+                            shape,
+                            x.position(),
+                            &nalgebra::zero(),
+                            x.shape().as_ref(),
+                            std::f32::MAX,
+                            0.0,
+                        )
+                        .map(|toi| (handle, toi))
+                    })
                     .min_by(|(_, toi1), (_, toi2)| toi1.toi.partial_cmp(&toi2.toi).unwrap());
                 all_clear = nearest.is_none();
             }
