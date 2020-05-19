@@ -5,14 +5,17 @@ use crate::{
     game::{Paddle, Side, ARENA_HEIGHT, PADDLE_HEIGHT, PADDLE_VELOCITY},
     world::*,
 };
+use alga::linear::AffineTransformation;
 use amethyst::{
     core::{timing::Time, SystemDesc, Transform},
     derive::SystemDesc,
     ecs::prelude::*,
     input::{InputHandler, StringBindings},
 };
-use nalgebra::{Unit, Vector2, Vector3};
+use log::debug;
+use nalgebra::{Isometry2, Translation2, Unit, Vector2, Vector3};
 use ncollide2d::{
+    bounding_volume::bounding_volume::BoundingVolume,
     pipeline::{narrow_phase::ContactAlgorithm, object::CollisionObjectSlabHandle},
     query::ContactManifold,
 };
@@ -199,6 +202,8 @@ impl<'s> System<'s> for GravitySystem {
 #[derive(SystemDesc)]
 pub struct ApplyVelocity;
 
+pub const MARGIN_DISTANCE: f32 = 0.01;
+
 impl<'s> System<'s> for ApplyVelocity {
     type SystemData = (
         WriteStorage<'s, Transform>,
@@ -212,89 +217,143 @@ impl<'s> System<'s> for ApplyVelocity {
         &mut self,
         (mut transforms, mut velocities, presences, handles, ncollide_world, time): Self::SystemData,
     ) {
-        // const DIRECTIONS: &Vector2 = &[Vector2::x(), Vector2::y()];
-
         let ncollide_world = &ncollide_world.world;
         let delta_seconds = time.delta_seconds();
         for (transform, velocity, presence, handle) in
             (&mut transforms, &mut velocities, &presences, &handles).join()
         {
             let mut isometry = transform.to_2d_isometry();
+            let shape = &*presence.shape;
             let velocity = &mut velocity.intended;
             let handle = handle.0;
             let mut direction = Unit::<Vector2<f32>>::new_normalize(*velocity);
             let mut maximum_distance = velocity.magnitude() * delta_seconds;
 
-            let sweep = ncollide_world.sweep_test(
-                &*presence.shape,
-                &isometry,
-                &direction,
-                maximum_distance,
-                &presence.collision_groups,
-            );
-            let mut nearest = sweep
-                .filter(|(_, toi)| toi.normal1.as_ref().dot(&direction) > 0.0)
-                .min_by(|(_, toi1), (_, toi2)| toi1.toi.partial_cmp(&toi2.toi).unwrap());
-            let mut all_clear = nearest.is_none();
+            let shape = &*presence.shape;
+            let all_clear = ncollide_world
+                .sweep_test(
+                    shape,
+                    &isometry,
+                    &direction,
+                    maximum_distance,
+                    &presence.collision_groups,
+                )
+                .next()
+                .is_none();
             if all_clear {
                 transform.prepend_translation(xy_with_zero_z(*velocity * delta_seconds));
                 continue;
             }
-            let obj = ncollide_world
-                .objects
-                .get(nearest.as_ref().unwrap().0)
-                .unwrap()
-                .position();
-            eprintln!(
-                "found a collision for {},{} moving {} in {},{}! Collision is with {},{} with normal1: {},{}, normal2: {},{} (full: {:?})",
-                transform.translation().x,
-                transform.translation().y,
-                maximum_distance,
-                direction.as_ref().x,
-                direction.as_ref().y,
-                obj.translation.x,
-                obj.translation.y,
-                nearest.as_ref().unwrap().1.normal1.x,
-                nearest.as_ref().unwrap().1.normal1.y,
-                nearest.as_ref().unwrap().1.normal2.x,
-                nearest.as_ref().unwrap().1.normal2.y,
-                nearest,
+            debug!(
+                "---- calculating collisions for object at {},{} with velocity {},{}",
+                isometry.translation.x, isometry.translation.y, velocity.x, velocity.y
             );
-            // beyond this point, code is only run if we do hit a collision
             let mut remaining_time = delta_seconds;
             let mut iterations_left = 5;
-            while let Some((_, toi)) = nearest {
+            let add_distance = |iso: &Isometry2<_>, direction: Unit<Vector2<_>>, distance| {
+                Isometry2::from_parts(
+                    iso.translation
+                        .prepend_translation(&Translation2::from(direction.as_ref() * distance)),
+                    iso.rotation,
+                )
+            };
+            let all_clear = loop {
+                let sweep = ncollide_world.sweep_test(
+                    shape,
+                    &isometry,
+                    &direction,
+                    maximum_distance,
+                    &presence.collision_groups,
+                );
+                let nearest = sweep
+                    .filter_map(|(obj, toi)| {
+                        let effected_by_toi = add_distance(&isometry, direction, toi.toi);
+                        let in_depth = add_distance(&effected_by_toi, direction, 0.1);
+                        let obj = ncollide_world.objects.get(obj).unwrap();
+                        let contact1 = ncollide2d::query::contact(
+                            &effected_by_toi,
+                            shape,
+                            obj.position(),
+                            &**obj.shape(),
+                            0.0,
+                        )?;
+                        let contact2 = ncollide2d::query::contact(
+                            &in_depth,
+                            shape,
+                            obj.position(),
+                            &**obj.shape(),
+                            0.0,
+                        )?;
+                        if contact2.depth > contact1.depth {
+                            Some((obj, toi, contact2))
+                        } else {
+                            None
+                        }
+                    })
+                    .min_by(|(_, toi1, _), (_, toi2, _)| toi1.toi.partial_cmp(&toi2.toi).unwrap());
+
+                let (obj, toi, contact_at_depth) = match nearest {
+                    Some(v) => v,
+                    None => break true,
+                };
+                debug!(
+                    "found a collision for {},{} moving {} in {},{}! Collision is with {},{} with normal1: {},{}, normal2: {},{} (full: {:?})",
+                    transform.translation().x,
+                    transform.translation().y,
+                    maximum_distance,
+                    direction.as_ref().x,
+                    direction.as_ref().y,
+                    obj.position().translation.x,
+                    obj.position().translation.y,
+                    toi.normal1.x,
+                    toi.normal1.y,
+                    toi.normal2.x,
+                    toi.normal2.y,
+                    toi,
+                );
+
                 transform.prepend_translation(xy_with_zero_z(toi.toi * direction.as_ref()));
                 remaining_time -= toi.toi / velocity.magnitude();
                 iterations_left -= 1;
                 // kill velocity towards our destination
-                *velocity -= velocity.dot(toi.normal1.as_ref()) * toi.normal1.as_ref();
+                let old_vel = *velocity;
+                *velocity -= velocity.dot(contact_at_depth.normal.as_ref())
+                    * contact_at_depth.normal.as_ref();
+                debug!(
+                    "velocity change: {},{} -> {},{}",
+                    old_vel.x, old_vel.y, velocity.x, velocity.y
+                );
                 direction = Unit::new_normalize(*velocity); // note: will be NaN if velocity == 0.0.
                 isometry = transform.to_2d_isometry();
                 maximum_distance = velocity.magnitude() * delta_seconds;
                 if remaining_time <= 0.0 || iterations_left == 0 || maximum_distance == 0.0 {
-                    break;
+                    break false;
                 }
+                debug!(
+                    "more movement left! new direction is {},{}",
+                    direction.as_ref().x,
+                    direction.as_ref().y
+                );
 
-                let interferences =
-                    ncollide_world.interferences_with_aabb(&aabb, &presence.collision_groups);
-                nearest = interferences
-                    .filter_map(|(handle, x)| {
-                        ncollide2d::query::time_of_impact(
-                            &isometry,
-                            &direction,
-                            shape,
-                            x.position(),
-                            &nalgebra::zero(),
-                            x.shape().as_ref(),
-                            std::f32::MAX,
-                            0.0,
-                        )
-                        .map(|toi| (handle, toi))
-                    })
-                    .min_by(|(_, toi1), (_, toi2)| toi1.toi.partial_cmp(&toi2.toi).unwrap());
-                all_clear = nearest.is_none();
-            }
+                // let interferences =
+                // ncollide_world.interferences_with_aabb(&aabb, &presence.collision_groups);
+                // let nearest = interferences
+                //     .filter_map(|(handle, x)| {
+                //         ncollide2d::query::time_of_impact(
+                //             &isometry,
+                //             &direction,
+                //             shape,
+                //             x.position(),
+                //             &nalgebra::zero(),
+                //             x.shape().as_ref(),
+                //             std::f32::MAX,
+                //             0.0,
+                //         )
+                //         .map(|toi| (handle, toi))
+                //     })
+                //     .min_by(|(_, toi1), (_, toi2)| toi1.toi.partial_cmp(&toi2.toi).unwrap());
+                //         all_clear = nearest.is_none();
+            };
             // do the last bit of movement if we stopped b/c of remaining_time
             // or iterations_left.
             if all_clear {

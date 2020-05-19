@@ -12,6 +12,7 @@ nalgebra = "0.19"
 ncollide2d = "0.21"
 hibitset = "0.6.3"
 alga = "0.9.3"
+log = "0.4.8"
 
 [profile.dev]
 incremental = true
