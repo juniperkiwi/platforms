@@ -28,7 +28,7 @@ use crate::collisions::*;
 const PLATFORM_COLLISION_GROUP: usize = 1;
 const PLAYER_COLLISION_GROUP: usize = 2;
 
-pub const PLAYER_JUMP: f32 = 100.0;
+pub const PLAYER_JUMP: f32 = 150.0;
 pub const GRAVITY_ACCEL: f32 = 10.0;
 
 #[derive(Copy, Clone, Default)]

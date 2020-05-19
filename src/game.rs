@@ -86,6 +86,19 @@ fn initialize_single(world: &mut World, sprite_render: SpriteRender) {
         .build();
 }
 
+fn initialize_stairs(world: &mut World, sprite_render: SpriteRender) {
+    (0..20).for_each(|i| {
+        world::create_platform(world)
+            .with(
+                Transform::default()
+                    .append_translation([i as f32 * 16.0, i as f32 * 16.0, 0.0].into())
+                    .clone(),
+            )
+            .with(sprite_render.clone())
+            .build();
+    });
+}
+
 pub fn initialize_platforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     let sprite_render = SpriteRender {
         sprite_sheet,
@@ -93,28 +106,10 @@ pub fn initialize_platforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>
     };
 
     world.register::<world::Platform>();
-    // initialize_box(world, sprite_render);
-    initialize_single(world, sprite_render);
-    // (1..9).for_each(|i| {
-    //     world::create_platform(world)
-    //         .with(
-    //             Transform::default()
-    //                 .append_translation([0.0, i as f32 * 16.0, 0.0].into())
-    //                 .clone(),
-    //         )
-    //         .with(sprite_render.clone())
-    //         .build();
-    // });
-    // [[8.0, 16.0, 0.0], [48.0, 16.0, 0.0]]
-    //     .iter()
-    //     .for_each(|&arr| {
-    //         world::create_platform(world)
-    //             .with(Transform::default().append_translation(arr.into()).clone())
-    //             .with(sprite_render.clone())
-    //             .build();
-    //     });
+    // initialize_box(world, sprite_render.clone());
+    initialize_single(world, sprite_render.clone());
+    initialize_stairs(world, sprite_render.clone());
 }
-
 fn initialize_player(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     let sprite_render = SpriteRender {
         sprite_sheet,
@@ -126,7 +121,7 @@ fn initialize_player(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     world::create_player(world)
         .with(
             Transform::default()
-                .append_translation([50.0, 50.0, 0.0].into())
+                .append_translation([50.0, 500.0, 0.0].into())
                 .clone(),
         )
         .with(sprite_render.clone())
