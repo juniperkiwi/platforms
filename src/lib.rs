@@ -12,8 +12,6 @@ use amethyst::{
     ui::{RenderUi, UiBundle},
     utils::application_root_dir,
 };
-use amethyst_nphysics::NPhysicsBackend;
-use amethyst_physics::PhysicsBundle;
 
 mod audio;
 mod collisions;
@@ -45,7 +43,7 @@ pub fn run() -> amethyst::Result<()> {
         .with_bundle(input_bundle)?
         .with_bundle(UiBundle::<StringBindings>::new())?
         // .with_bundle(AudioBundle::default())?
-        .with_bundle(PhysicsBundle::<f32, NPhysicsBackend>::new())?
+        //.with_bundle(PhysicsBundle::<f32, NPhysicsBackend>::new())?
         // .with(systems::PaddleSystem, "paddle_system", &["input_system"])
         // .with(systems::MoveBallsSystem, "ball_system", &[])
         // .with(

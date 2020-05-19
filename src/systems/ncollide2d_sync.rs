@@ -13,7 +13,6 @@ use amethyst::{
     shrev::EventChannel,
     ui::{Anchor, TtfFormat, UiText, UiTransform},
 };
-use amethyst_physics::objects::CollisionGroup;
 use hibitset::BitSet;
 use nalgebra::{Isometry2, Isometry3, Translation2, Translation3, UnitComplex, Vector2, Vector3};
 use ncollide2d::{
