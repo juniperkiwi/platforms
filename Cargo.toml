@@ -13,6 +13,7 @@ ncollide2d = "0.21"
 hibitset = "0.6.3"
 alga = "0.9.3"
 log = "0.4.8"
+serde = { version = "1.0.110", features = ["derive"] }
 
 [profile.dev]
 incremental = true

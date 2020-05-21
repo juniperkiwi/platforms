@@ -7,7 +7,12 @@ use amethyst::{
     ui::{Anchor, TtfFormat, UiText, UiTransform},
 };
 
-use crate::{audio::initialize_audio, world};
+use crate::{
+    audio::initialize_audio,
+    systems::{CameraTarget, CameraVelocity, TrackingCamera},
+    world,
+};
+use nalgebra::{UnitQuaternion, Vector3};
 
 pub const ARENA_HEIGHT: f32 = 100.0;
 pub const ARENA_WIDTH: f32 = 100.0;
@@ -23,12 +28,15 @@ pub const PADDLE_VELOCITY: f32 = 80.0;
 
 fn initialize_camera(world: &mut World) {
     let mut transform = Transform::default();
-    transform.set_translation_xyz(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 1.0);
+    // transform.set_translation_xyz(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 1.0);
+    transform.set_translation_xyz(16.0, 32.0, 1.0);
 
     world
         .create_entity()
         .with(Camera::standard_2d(ARENA_WIDTH, ARENA_HEIGHT))
         .with(transform)
+        .with(CameraVelocity::default())
+        .with(TrackingCamera)
         .build();
 }
 
@@ -106,10 +114,11 @@ pub fn initialize_platforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>
     };
 
     world.register::<world::Platform>();
-    // initialize_box(world, sprite_render.clone());
+    initialize_box(world, sprite_render.clone());
     initialize_single(world, sprite_render.clone());
     initialize_stairs(world, sprite_render.clone());
 }
+
 fn initialize_player(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     let sprite_render = SpriteRender {
         sprite_sheet,
@@ -121,38 +130,14 @@ fn initialize_player(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     world::create_player(world)
         .with(
             Transform::default()
-                .append_translation([50.0, 500.0, 0.0].into())
+                .append_translation(Vector3::new(50.0, 150.0, 0.0))
                 .clone(),
         )
+        .with(CameraTarget {
+            offset: Vector3::new(0.0, 0.0, 1.0),
+            target_rotation: UnitQuaternion::identity(),
+        })
         .with(sprite_render.clone())
-        .build();
-}
-
-fn initialize_paddles(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
-    let sprite_render = SpriteRender {
-        sprite_sheet: sprite_sheet_handle,
-        sprite_number: 0,
-    };
-
-    let mut left_transform = Transform::default();
-    let mut right_transform = Transform::default();
-
-    let y = ARENA_HEIGHT / 2.0;
-    left_transform.set_translation_xyz(PADDLE_WIDTH * 0.5, y, 0.0);
-    right_transform.set_translation_xyz(ARENA_WIDTH - PADDLE_WIDTH * 0.5, y, 0.0);
-
-    world
-        .create_entity()
-        .with(Paddle::new(Side::Left))
-        .with(sprite_render.clone())
-        .with(left_transform)
-        .build();
-
-    world
-        .create_entity()
-        .with(Paddle::new(Side::Right))
-        .with(sprite_render.clone())
-        .with(right_transform)
         .build();
 }
 
@@ -263,7 +248,6 @@ impl SimpleState for Game {
         let sprite_sheet = load_sprite_sheet(world);
 
         initialize_camera(world);
-        // initialize_paddles(world, sprite_sheet.clone());
         // initialize_scoreboard(world);
         // initialize_audio(world);
         initialize_platforms(world, sprite_sheet.clone());

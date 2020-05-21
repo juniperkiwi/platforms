@@ -1,0 +1,13 @@
+(
+    player_horizontal_velocity: 80.0,
+    player_jump: 250.0,
+    gravity_accel: 1000.0,
+    camera_rotation_modifier: 0.0,
+    camera_translation_modifier1: 10,
+    camera_translation_modifier2: 1,
+    camera_translation_dampener_mul: 0.1,
+    camera_translation_dampener_pow: 0.5,
+    camera_translation_time_to_reach_before_dampening_secs: 1,
+    camera_translation_dampener_distance_modifier_for_mul: 0.4,
+    camera_translation_max_damp2: 0.99,
+)

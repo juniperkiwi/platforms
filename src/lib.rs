@@ -19,12 +19,14 @@ mod game;
 mod systems;
 mod world;
 
-use crate::{audio::Music, game::Game};
+use crate::{audio::Music, game::Game, world::ConstantsConfig};
 
 pub fn run() -> amethyst::Result<()> {
     let app_root = application_root_dir()?;
-    let display_config_path = app_root.join("config").join("display.ron");
-    let bindings_path = app_root.join("config").join("bindings.ron");
+    let config = app_root.join("config");
+    let display_config_path = config.join("display.ron");
+    let bindings_path = config.join("bindings.ron");
+    let constants_path = config.join("constants.ron");
 
     let input_bundle =
         InputBundle::<StringBindings>::new().with_bindings_from_file(bindings_path)?;
@@ -86,10 +88,17 @@ pub fn run() -> amethyst::Result<()> {
             systems::ApplyVelocity,
             "apply_velocity",
             &["ncollide2d_update_world", "move_player", "gravity"],
+        )
+        .with(
+            systems::CameraTrackTargetSystem,
+            "track_camera",
+            &["apply_velocity"],
         );
 
     let assets_dir = app_root.join("assets");
-    let mut game = Application::new(assets_dir, Game::default(), game_data)?;
+    let mut game = Application::build(assets_dir, Game::default())?
+        .with_resource(ConstantsConfig::load(constants_path)?)
+        .build(game_data)?;
     game.run();
 
     Ok(())

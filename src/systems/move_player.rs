@@ -36,10 +36,11 @@ impl<'s> System<'s> for MovePlayerSystem {
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, Ncollide2dWorld>,
         Read<'s, Time>,
+        ReadExpect<'s, ConstantsConfig>,
     );
     fn run(
         &mut self,
-        (mut transforms, mut velocities, handles, players, input, ncollide_world, time): Self::SystemData,
+        (mut transforms, mut velocities, handles, players, input, ncollide_world, time, constants): Self::SystemData,
     ) {
         let ncollide_world = &ncollide_world.world;
         for (transform, velocity, handle, _) in
@@ -48,12 +49,12 @@ impl<'s> System<'s> for MovePlayerSystem {
             let lr = input.axis_value("left_right");
             let jump = input.action_is_down("jump");
             if let Some(lr) = lr {
-                velocity.intended.x = lr as f32 * PADDLE_VELOCITY;
+                velocity.intended.x = lr as f32 * constants.player_horizontal_velocity;
             }
             if jump.unwrap_or(false) {
                 if on_floor(ncollide_world, handle.0) {
                     debug!("jumping from floor!");
-                    velocity.intended.y += PLAYER_JUMP;
+                    velocity.intended.y += constants.player_jump;
                 } else {
                     debug!("jumping but not on floor");
                 }
@@ -134,10 +135,11 @@ impl<'s> System<'s> for GravitySystem {
         ReadStorage<'s, Ncollide2dHandle>,
         Read<'s, Ncollide2dWorld>,
         Read<'s, Time>,
+        ReadExpect<'s, ConstantsConfig>,
     );
     fn run(
         &mut self,
-        (mut transforms, mut velocities, handles, ncollide_world, time): Self::SystemData,
+        (mut transforms, mut velocities, handles, ncollide_world, time, constants): Self::SystemData,
     ) {
         let ncollide_world = &ncollide_world.world;
         for (transform, velocity, handle) in (&mut transforms, &mut velocities, &handles).join() {
@@ -147,7 +149,7 @@ impl<'s> System<'s> for GravitySystem {
                     debug!("gravity: on floor");
                 }
             } else {
-                velocity.intended.y -= GRAVITY_ACCEL;
+                velocity.intended.y -= constants.gravity_accel * time.delta_seconds();
             }
         }
     }
@@ -266,7 +268,7 @@ impl<'s> System<'s> for ApplyVelocity {
                 transform.prepend_translation(xy_with_zero_z(toi.toi * direction.as_ref()));
                 remaining_time -= toi.toi / velocity.magnitude();
                 iterations_left -= 1;
-                // kill velocity towards our destination
+                // kill velocity towards the obstacle.
                 let old_vel = *velocity;
                 *velocity -= velocity.dot(contact_at_depth.normal.as_ref())
                     * contact_at_depth.normal.as_ref();

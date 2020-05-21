@@ -28,8 +28,23 @@ use crate::collisions::*;
 const PLATFORM_COLLISION_GROUP: usize = 1;
 const PLAYER_COLLISION_GROUP: usize = 2;
 
-pub const PLAYER_JUMP: f32 = 150.0;
-pub const GRAVITY_ACCEL: f32 = 10.0;
+// pub const PLAYER_JUMP: f32 = 300.0;
+// pub const GRAVITY_ACCEL: f32 = 15.0;
+
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct ConstantsConfig {
+    pub player_horizontal_velocity: f32,
+    pub player_jump: f32,
+    pub gravity_accel: f32,
+    pub camera_rotation_modifier: f32,
+    pub camera_translation_modifier1: f32,
+    pub camera_translation_modifier2: f32,
+    pub camera_translation_dampener_mul: f32,
+    pub camera_translation_dampener_pow: f32,
+    pub camera_translation_time_to_reach_before_dampening_secs: f32,
+    pub camera_translation_dampener_distance_modifier_for_mul: f32,
+    pub camera_translation_max_damp2: f32,
+}
 
 #[derive(Copy, Clone, Default)]
 pub struct Platform;
