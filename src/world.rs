@@ -23,7 +23,7 @@ use ncollide2d::{
 };
 use std::collections::BTreeMap;
 
-use crate::collisions::*;
+use crate::{collisions::*, systems::CameraFollowConstants};
 
 const PLATFORM_COLLISION_GROUP: usize = 1;
 const PLAYER_COLLISION_GROUP: usize = 2;
@@ -36,14 +36,7 @@ pub struct ConstantsConfig {
     pub player_horizontal_velocity: f32,
     pub player_jump: f32,
     pub gravity_accel: f32,
-    pub camera_rotation_modifier: f32,
-    pub camera_translation_modifier1: f32,
-    pub camera_translation_modifier2: f32,
-    pub camera_translation_dampener_mul: f32,
-    pub camera_translation_dampener_pow: f32,
-    pub camera_translation_time_to_reach_before_dampening_secs: f32,
-    pub camera_translation_dampener_distance_modifier_for_mul: f32,
-    pub camera_translation_max_damp2: f32,
+    pub camera_follow: CameraFollowConstants,
 }
 
 #[derive(Copy, Clone, Default)]

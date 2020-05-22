@@ -59,6 +59,15 @@ impl Default for CameraVelocity {
     }
 }
 
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct CameraFollowConstants {
+    time_to_target: f32,
+    time_to_velocity: f32,
+    lerp_multiplier: f32,
+    min_velocity: f32,
+    max_velocity: f32,
+}
+
 #[derive(SystemDesc)]
 pub struct CameraTrackTargetSystem;
 
@@ -75,6 +84,7 @@ impl<'s> System<'s> for CameraTrackTargetSystem {
         &mut self,
         (mut transforms, mut camera_velocities, tracking_cameras, camera_targets, time, constants): Self::SystemData,
     ) {
+        let constants = &constants.camera_follow;
         let mut target_data = None;
         for (transform, tracking) in (&transforms, &camera_targets).join() {
             assert!(target_data.is_none(), "duplicate camera tracking targets");
@@ -98,80 +108,41 @@ impl<'s> System<'s> for CameraTrackTargetSystem {
         {
             match velocity {
                 Some(velocity) => {
-                    //let rotation_accel = target_rotation.nlerp(transform.rotation(), time.delta_seconds() * constants.camera_rotation_modifier);
-                    let translation_accel = ((target_translation - transform.translation())
-                        * constants.camera_translation_modifier1)
-                        .map(|f| {
-                            let f2 = f.powf(constants.camera_translation_modifier2);
-                            if f2.is_finite() {
-                                f2
-                            } else {
-                                f
-                            }
-                        })
-                        * time.delta_seconds();
-
-                    //velocity.rotation = velocity.rotation + rotation_accel;
-                    velocity.translation += translation_accel;
-                    velocity.translation = velocity.translation.lerp(
-                        &(velocity.translation
-                            * time.delta_seconds()
-                            * constants.camera_translation_dampener_mul),
-                        time.delta_seconds(),
-                    );
-                    velocity.translation = velocity.translation.lerp(
-                        &velocity.translation.zip_map(
-                            &(transform.translation() - target_translation),
-                            |f, dist| {
-                                let time_to_reach = (dist / f).abs();
-                                let time2 = time_to_reach.min(
-                                    constants
-                                        .camera_translation_time_to_reach_before_dampening_secs,
-                                );
-                                let inverted_time = 1.0 / time2;
-                                f * (1.0
-                                    - (inverted_time
-                                        * constants
-                                            .camera_translation_dampener_distance_modifier_for_mul)
-                                        .min(constants.camera_translation_max_damp2))
-                            },
-                        ),
-                        time.delta_seconds(),
-                    );
-                    velocity.translation = velocity.translation.lerp(
-                        &velocity.translation.map(|f| {
-                            f.signum() * f.abs().powf(constants.camera_translation_dampener_pow)
-                        }),
-                        time.delta_seconds(),
-                    );
-                    //transform.set_rotation(transform.rotation() + velocity.rotation * time.delta_seconds());
-                    transform.set_translation(transform.translation().zip_zip_map(
-                        &target_translation,
-                        &(velocity.translation * time.delta_seconds()),
-                        |current, target, movement| {
-                            let distance = target - current;
-                            if distance.signum() == movement.signum() && movement.abs() > distance.abs() {
-                                println!(
-                                    "going directly to target as {}.signum() \
-                                    == {}.signum() == {} and {} > {}",
-                                    distance,
-                                    movement,
-                                    distance.signum(),
-                                    movement,
-                                    distance
-                                );
-                                target
-                            } else {
-                                current + movement
-                            }
-                        },
-                    ));
+                    let here = *transform.translation();
+                    // let velocity = &mut velocity.translation;
+                    let delta_t = time.delta_seconds();
+                    let distance = target_translation - here;
+                    // let target_velocity = distance / constants.time_to_target;
+                    // *velocity =
+                    // velocity.lerp(&target_velocity, delta_t /
+                    // constants.time_to_velocity);
+                    let mut velocity = constants.lerp_multiplier * distance;
+                    if velocity.magnitude() > constants.max_velocity {
+                        velocity = velocity.normalize() * constants.max_velocity;
+                    } else if velocity.magnitude() < constants.min_velocity {
+                        velocity =
+                            velocity.normalize() * constants.min_velocity.min(distance.magnitude());
+                    }
+                    transform.set_translation(here + (delta_t * velocity));
                 }
                 None => {
                     transform.set_translation(target_translation);
                     transform.set_rotation(target_rotation);
                 }
             };
+        }
+    }
+}
+
+trait FloatExt {
+    fn finite_or(self, v: Self) -> Self;
+}
+impl FloatExt for f32 {
+    fn finite_or(self, v: Self) -> Self {
+        if self.is_finite() {
+            self
+        } else {
+            v
         }
     }
 }
