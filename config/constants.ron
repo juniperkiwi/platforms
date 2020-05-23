@@ -1,9 +1,17 @@
 (
-    player_horizontal_velocity: 80.0,
-    player_jump: 250.0,
     gravity_accel: 1000.0,
     camera_follow: (
         time_to_target: 0.3,
         smoothing_factor: 15.0,
+    ),
+    player: (
+        jump: 250.0,
+        horizontal_acceleration: 600.0,
+        horizontal_decrease_multiplier: 0.3,
+        horizontal_decrease_secs_per_decrease: 0.1,
+        air_boost_increase_min_velocity: 30.0,
+        air_boost_increase_per_sec: 2.0,
+        air_boost_decrease_per_sec: 1.0,
+        air_boost_max: 1.0,
     )
 )

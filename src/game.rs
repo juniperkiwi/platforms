@@ -115,7 +115,7 @@ pub fn initialize_platforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>
     world.register::<world::Platform>();
     initialize_box(world, sprite_render.clone());
     initialize_single(world, sprite_render.clone());
-    initialize_stairs(world, sprite_render.clone());
+    //initialize_stairs(world, sprite_render.clone());
 }
 
 fn initialize_player(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {

@@ -16,10 +16,11 @@ use ncollide2d::{
     pipeline::{CollisionGroups, GeometricQueryType},
     shape::{Cuboid, ShapeHandle},
 };
+use specs_derive::Component;
 
 use crate::{
     collisions::components::{CollisionPresence, HasGravity},
-    systems::CameraFollowConstants,
+    systems::{CameraFollowConstants, PlayerMovementConstants},
 };
 
 const PLATFORM_COLLISION_GROUP: usize = 1;
@@ -30,27 +31,23 @@ const PLAYER_COLLISION_GROUP: usize = 2;
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct ConstantsConfig {
-    pub player_horizontal_velocity: f32,
-    pub player_jump: f32,
+    pub player: PlayerMovementConstants,
     pub gravity_accel: f32,
     pub camera_follow: CameraFollowConstants,
 }
 
-#[derive(Copy, Clone, Default)]
+#[derive(Copy, Clone, Default, Component)]
+#[storage(NullStorage)]
 pub struct Platform;
 
-impl Component for Platform {
-    type Storage = NullStorage<Self>;
+#[derive(Copy, Clone, Component, Default)]
+#[storage(DenseVecStorage)]
+pub struct Player {
+    pub air_boost: f32,
 }
 
-#[derive(Copy, Clone, Default)]
-pub struct Player;
-
-impl Component for Player {
-    type Storage = NullStorage<Self>;
-}
-
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Component)]
+#[storage(DenseVecStorage)]
 pub struct Velocity {
     pub(crate) intended: Vector2<f32>,
 }
@@ -60,10 +57,6 @@ impl Default for Velocity {
             intended: [0.0; 2].into(),
         }
     }
-}
-
-impl Component for Velocity {
-    type Storage = DenseVecStorage<Self>;
 }
 
 pub fn create_platform(world: &mut World) -> EntityBuilder {
@@ -88,7 +81,7 @@ pub fn create_player(world: &mut World) -> EntityBuilder {
     collision_groups.disable_self_interaction();
     world
         .create_entity()
-        .with(Player)
+        .with(Player::default())
         .with(CollisionPresence {
             shape: ShapeHandle::new(Cuboid::new([8.0, 8.0].into())),
             collision_groups,

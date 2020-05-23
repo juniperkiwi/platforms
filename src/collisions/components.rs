@@ -4,7 +4,6 @@ use amethyst::{
     ecs::prelude::*,
     input::{InputHandler, StringBindings},
 };
-
 use ncollide2d::{
     bounding_volume::bounding_volume::BoundingVolume,
     pipeline::{
@@ -14,6 +13,7 @@ use ncollide2d::{
     query::{Contact, ContactManifold},
     shape::{Shape, ShapeHandle},
 };
+use specs_derive::Component;
 
 #[derive(Clone)]
 pub struct CollisionPresence {
@@ -26,14 +26,10 @@ impl Component for CollisionPresence {
     type Storage = FlaggedStorage<Self, VecStorage<Self>>;
 }
 
+#[derive(Component)]
+#[storage(VecStorage)]
 pub struct Ncollide2dHandle(pub(crate) CollisionObjectSlabHandle);
 
-impl Component for Ncollide2dHandle {
-    type Storage = VecStorage<Self>;
-}
-
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Component)]
+#[storage(NullStorage)]
 pub struct HasGravity;
-impl Component for HasGravity {
-    type Storage = NullStorage<Self>;
-}
