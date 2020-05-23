@@ -44,7 +44,6 @@ impl Component for CameraTarget {
 #[derive(Clone)]
 pub struct CameraVelocity {
     pub translation: Vector3<f32>,
-    pub rotation: UnitQuaternion<f32>,
 }
 
 impl Component for CameraVelocity {
@@ -54,7 +53,6 @@ impl Default for CameraVelocity {
     fn default() -> Self {
         CameraVelocity {
             translation: Vector3::zeros(),
-            rotation: UnitQuaternion::identity(),
         }
     }
 }
@@ -62,10 +60,7 @@ impl Default for CameraVelocity {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct CameraFollowConstants {
     time_to_target: f32,
-    time_to_velocity: f32,
-    lerp_multiplier: f32,
-    min_velocity: f32,
-    max_velocity: f32,
+    smoothing_factor: f32,
 }
 
 #[derive(SystemDesc)]
@@ -108,22 +103,21 @@ impl<'s> System<'s> for CameraTrackTargetSystem {
         {
             match velocity {
                 Some(velocity) => {
+                    // Credit for the algorithm here to
+                    // https://github.com/azriel91/autexousious/blob/0.19.0/crate/camera_play/src/system/camera_velocity_system.rs
                     let here = *transform.translation();
-                    // let velocity = &mut velocity.translation;
                     let delta_t = time.delta_seconds();
                     let distance = target_translation - here;
-                    // let target_velocity = distance / constants.time_to_target;
-                    // *velocity =
-                    // velocity.lerp(&target_velocity, delta_t /
-                    // constants.time_to_velocity);
-                    let mut velocity = constants.lerp_multiplier * distance;
-                    if velocity.magnitude() > constants.max_velocity {
-                        velocity = velocity.normalize() * constants.max_velocity;
-                    } else if velocity.magnitude() < constants.min_velocity {
-                        velocity =
-                            velocity.normalize() * constants.min_velocity.min(distance.magnitude());
+                    let target_velocity = distance / constants.time_to_target;
+                    velocity.translation = velocity
+                        .translation
+                        .lerp(&target_velocity, constants.smoothing_factor * delta_t);
+                    if velocity.translation.magnitude() * delta_t > distance.magnitude() {
+                        velocity.translation = Vector3::zeros();
+                        transform.set_translation(target_translation);
+                    } else {
+                        transform.set_translation(here + (delta_t * velocity.translation));
                     }
-                    transform.set_translation(here + (delta_t * velocity));
                 }
                 None => {
                     transform.set_translation(target_translation);

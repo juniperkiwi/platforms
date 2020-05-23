@@ -4,9 +4,6 @@
     gravity_accel: 1000.0,
     camera_follow: (
         time_to_target: 0.3,
-        time_to_velocity: 0.3,
-        min_velocity: 5.0,
-        max_velocity: 100.0,
-        lerp_multiplier: 15.0,
+        smoothing_factor: 15.0,
     )
 )
