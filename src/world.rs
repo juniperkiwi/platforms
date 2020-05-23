@@ -23,7 +23,10 @@ use ncollide2d::{
 };
 use std::collections::BTreeMap;
 
-use crate::{collisions::*, systems::CameraFollowConstants};
+use crate::{
+    collisions::*,
+    systems::{CameraFollowConstants, HasGravity},
+};
 
 const PLATFORM_COLLISION_GROUP: usize = 1;
 const PLAYER_COLLISION_GROUP: usize = 2;
@@ -97,5 +100,6 @@ pub fn create_player(world: &mut World) -> EntityBuilder {
             collision_groups,
             query_type: GeometricQueryType::Contacts(20.0, 0.0),
         })
+        .with(HasGravity)
         .with(Velocity::default())
 }

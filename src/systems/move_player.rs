@@ -24,6 +24,12 @@ use ncollide2d::{
     shape::Shape,
 };
 
+#[derive(Default, Debug)]
+pub struct HasGravity;
+impl Component for HasGravity {
+    type Storage = NullStorage<Self>;
+}
+
 #[derive(SystemDesc)]
 pub struct MovePlayerSystem;
 
@@ -130,8 +136,8 @@ pub struct GravitySystem;
 
 impl<'s> System<'s> for GravitySystem {
     type SystemData = (
-        WriteStorage<'s, Transform>,
         WriteStorage<'s, Velocity>,
+        ReadStorage<'s, HasGravity>,
         ReadStorage<'s, Ncollide2dHandle>,
         Read<'s, Ncollide2dWorld>,
         Read<'s, Time>,
@@ -139,16 +145,11 @@ impl<'s> System<'s> for GravitySystem {
     );
     fn run(
         &mut self,
-        (mut transforms, mut velocities, handles, ncollide_world, time, constants): Self::SystemData,
+        (mut velocities, gravities, handles, ncollide_world, time, constants): Self::SystemData,
     ) {
         let ncollide_world = &ncollide_world.world;
-        for (transform, velocity, handle) in (&mut transforms, &mut velocities, &handles).join() {
-            if on_floor(ncollide_world, handle.0) {
-                if velocity.intended.y < 0.0 {
-                    velocity.intended.y = 0.0;
-                    debug!("gravity: on floor");
-                }
-            } else {
+        for (velocity, _, handle) in (&mut velocities, &gravities, &handles).join() {
+            if !on_floor(ncollide_world, handle.0) {
                 velocity.intended.y -= constants.gravity_accel * time.delta_seconds();
             }
         }
