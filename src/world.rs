@@ -24,8 +24,8 @@ use ncollide2d::{
 use std::collections::BTreeMap;
 
 use crate::{
-    collisions::*,
-    systems::{CameraFollowConstants, HasGravity},
+    collisions::components::{CollisionPresence, HasGravity},
+    systems::CameraFollowConstants,
 };
 
 const PLATFORM_COLLISION_GROUP: usize = 1;

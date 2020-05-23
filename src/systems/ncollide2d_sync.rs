@@ -1,5 +1,9 @@
 use std::collections::BTreeMap;
 
+use crate::collisions::{
+    components::{CollisionPresence, Ncollide2dHandle},
+    prelude::TransformExt,
+};
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},
     core::{timing::Time, Transform},
@@ -24,9 +28,17 @@ use ncollide2d::{
     shape::ShapeHandle,
 };
 
-use crate::collisions::{
-    CollisionPresence, IsometryExt, Ncollide2dHandle, Ncollide2dWorld, TransformExt,
-};
+pub struct Ncollide2dWorld {
+    pub world: CollisionWorld<f32, Entity>,
+}
+
+impl Default for Ncollide2dWorld {
+    fn default() -> Self {
+        Ncollide2dWorld {
+            world: CollisionWorld::new(0.02),
+        }
+    }
+}
 
 #[derive(Copy, Clone)]
 enum ChangeType {

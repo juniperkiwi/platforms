@@ -1,10 +1,4 @@
-use crate::{
-    collisions::{
-        CollisionPresence, IsometryExt, Ncollide2dHandle, Ncollide2dWorld, TransformExt, *,
-    },
-    game::{Paddle, Side, ARENA_HEIGHT, PADDLE_HEIGHT, PADDLE_VELOCITY},
-    world::*,
-};
+use crate::world::*;
 use alga::linear::AffineTransformation;
 use amethyst::{
     core::{timing::Time, SystemDesc, Transform},
