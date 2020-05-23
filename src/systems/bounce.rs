@@ -1,7 +1,7 @@
 use amethyst::{
     assets::AssetStorage,
     audio::{output::Output, Source},
-    core::{SystemDesc, Transform},
+    core::Transform,
     derive::SystemDesc,
     ecs::prelude::*,
 };

@@ -11,17 +11,11 @@ use amethyst::{
     shrev::EventChannel,
     ui::{Anchor, TtfFormat, UiText, UiTransform},
 };
-use hibitset::BitSet;
 use nalgebra::{Isometry2, Isometry3, Translation2, Translation3, UnitComplex, Vector2, Vector3};
 use ncollide2d::{
-    pipeline::{
-        object::{CollisionObject, CollisionObjectSlabHandle},
-        world::CollisionWorld,
-        CollisionGroups, GeometricQueryType,
-    },
+    pipeline::{CollisionGroups, GeometricQueryType},
     shape::{Cuboid, ShapeHandle},
 };
-use std::collections::BTreeMap;
 
 use crate::{
     collisions::components::{CollisionPresence, HasGravity},

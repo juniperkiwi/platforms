@@ -1,6 +1,5 @@
 #![allow(dead_code, unused_imports, unused_variables)]
 use amethyst::{
-    audio::{AudioBundle, DjSystemDesc},
     core::transform::TransformBundle,
     input::{InputBundle, StringBindings},
     prelude::*,
@@ -19,7 +18,7 @@ mod game;
 mod systems;
 mod world;
 
-use crate::{audio::Music, game::Game, world::ConstantsConfig};
+use crate::{game::Game, world::ConstantsConfig};
 
 pub fn run() -> amethyst::Result<()> {
     let app_root = application_root_dir()?;

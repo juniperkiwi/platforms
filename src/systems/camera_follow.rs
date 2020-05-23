@@ -1,4 +1,3 @@
-use crate::world::*;
 use alga::linear::AffineTransformation;
 use amethyst::{
     core::{timing::Time, SystemDesc, Transform},
@@ -6,17 +5,9 @@ use amethyst::{
     ecs::prelude::*,
     input::{InputHandler, StringBindings},
 };
-use log::debug;
 use nalgebra::{Isometry2, Translation2, Unit, UnitQuaternion, Vector2, Vector3};
-use ncollide2d::{
-    bounding_volume::bounding_volume::BoundingVolume,
-    pipeline::{
-        narrow_phase::ContactAlgorithm, object::CollisionObjectSlabHandle, CollisionObject,
-        CollisionWorld,
-    },
-    query::{Contact, ContactManifold},
-    shape::Shape,
-};
+
+use crate::world::*;
 
 #[derive(Default)]
 pub struct TrackingCamera;

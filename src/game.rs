@@ -1,18 +1,17 @@
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},
-    core::{timing::Time, Transform},
+    core::Transform,
     ecs::prelude::{Component, DenseVecStorage, Entity},
     prelude::*,
     renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
     ui::{Anchor, TtfFormat, UiText, UiTransform},
 };
+use nalgebra::{UnitQuaternion, Vector3};
 
 use crate::{
-    audio::initialize_audio,
     systems::{CameraTarget, CameraVelocity, TrackingCamera},
     world,
 };
-use nalgebra::{UnitQuaternion, Vector3};
 
 pub const ARENA_HEIGHT: f32 = 100.0;
 pub const ARENA_WIDTH: f32 = 100.0;

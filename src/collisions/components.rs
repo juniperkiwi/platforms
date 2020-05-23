@@ -1,13 +1,10 @@
-use crate::world::*;
-use alga::linear::AffineTransformation;
 use amethyst::{
     core::{timing::Time, SystemDesc, Transform},
     derive::SystemDesc,
     ecs::prelude::*,
     input::{InputHandler, StringBindings},
 };
-use log::debug;
-use nalgebra::{Isometry2, Translation2, Unit, Vector2, Vector3};
+
 use ncollide2d::{
     bounding_volume::bounding_volume::BoundingVolume,
     pipeline::{

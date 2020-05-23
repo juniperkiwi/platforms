@@ -1,5 +1,5 @@
 use amethyst::{
-    core::{timing::Time, SystemDesc, Transform},
+    core::{timing::Time, Transform},
     derive::SystemDesc,
     ecs::prelude::*,
 };

@@ -1,9 +1,5 @@
 use std::collections::BTreeMap;
 
-use crate::collisions::{
-    components::{CollisionPresence, Ncollide2dHandle},
-    prelude::TransformExt,
-};
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},
     core::{timing::Time, Transform},
@@ -18,7 +14,6 @@ use amethyst::{
     ui::{Anchor, TtfFormat, UiText, UiTransform},
 };
 use hibitset::BitSet;
-use nalgebra::{Isometry2, Isometry3, Translation2, Translation3, UnitComplex, Vector2, Vector3};
 use ncollide2d::{
     pipeline::{
         object::{CollisionObject, CollisionObjectSlabHandle},
@@ -26,6 +21,11 @@ use ncollide2d::{
         CollisionGroups, GeometricQueryType,
     },
     shape::ShapeHandle,
+};
+
+use crate::collisions::{
+    components::{CollisionPresence, Ncollide2dHandle},
+    prelude::TransformExt,
 };
 
 pub struct Ncollide2dWorld {

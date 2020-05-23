@@ -1,25 +1,15 @@
-use super::Ncollide2dWorld;
-use crate::{
-    collisions::{components::Ncollide2dHandle, resolution_utils::on_floor},
-    world::*,
-};
-use alga::linear::AffineTransformation;
 use amethyst::{
-    core::{timing::Time, SystemDesc, Transform},
+    core::{timing::Time, Transform},
     derive::SystemDesc,
     ecs::prelude::*,
     input::{InputHandler, StringBindings},
 };
 use log::debug;
-use nalgebra::{Isometry2, Translation2, Unit, Vector2, Vector3};
-use ncollide2d::{
-    bounding_volume::bounding_volume::BoundingVolume,
-    pipeline::{
-        narrow_phase::ContactAlgorithm, object::CollisionObjectSlabHandle, CollisionObject,
-        CollisionWorld,
-    },
-    query::{Contact, ContactManifold},
-    shape::Shape,
+
+use super::Ncollide2dWorld;
+use crate::{
+    collisions::{components::Ncollide2dHandle, resolution_utils::on_floor},
+    world::*,
 };
 
 #[derive(SystemDesc)]
