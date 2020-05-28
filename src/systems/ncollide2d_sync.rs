@@ -1,27 +1,15 @@
 use std::collections::BTreeMap;
 
 use amethyst::{
-    assets::{AssetStorage, Handle, Loader},
-    core::{timing::Time, Transform},
+    core::Transform,
     ecs::{
         prelude::*,
         world::{EntitiesRes, Index},
     },
-    prelude::*,
-    renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
     shred::DynamicSystemData,
-    shrev::EventChannel,
-    ui::{Anchor, TtfFormat, UiText, UiTransform},
 };
 use hibitset::BitSet;
-use ncollide2d::{
-    pipeline::{
-        object::{CollisionObject, CollisionObjectSlabHandle},
-        world::CollisionWorld,
-        CollisionGroups, GeometricQueryType,
-    },
-    shape::ShapeHandle,
-};
+use ncollide2d::pipeline::{object::CollisionObject, world::CollisionWorld};
 
 use crate::collisions::{
     components::{CollisionPresence, Ncollide2dHandle},

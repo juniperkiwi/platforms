@@ -1,11 +1,5 @@
 use alga::linear::AffineTransformation;
-use amethyst::{
-    core::{timing::Time, SystemDesc, Transform},
-    derive::SystemDesc,
-    ecs::prelude::*,
-    input::{InputHandler, StringBindings},
-};
-
+use amethyst::core::Transform;
 use nalgebra::{
     Isometry2, Translation2, Translation3, Unit, UnitComplex, UnitQuaternion, Vector2, Vector3,
 };

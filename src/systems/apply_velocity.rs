@@ -1,9 +1,7 @@
-use alga::linear::AffineTransformation;
 use amethyst::{
-    core::{timing::Time, SystemDesc, Transform},
+    core::{timing::Time, Transform},
     derive::SystemDesc,
     ecs::prelude::*,
-    input::{InputHandler, StringBindings},
 };
 use log::debug;
 use nalgebra::{Unit, Vector2, Vector3};

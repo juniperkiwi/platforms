@@ -5,7 +5,6 @@ use amethyst::{
     input::{InputHandler, StringBindings},
 };
 use log::debug;
-use specs_derive::Component;
 
 use super::Ncollide2dWorld;
 use crate::{

@@ -1,9 +1,4 @@
-use amethyst::{
-    core::{timing::Time, SystemDesc, Transform},
-    derive::SystemDesc,
-    ecs::prelude::*,
-    input::{InputHandler, StringBindings},
-};
+use amethyst::{core::timing::Time, derive::SystemDesc, ecs::prelude::*};
 
 use super::Ncollide2dWorld;
 use crate::{

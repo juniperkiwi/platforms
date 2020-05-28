@@ -1,17 +1,5 @@
-use amethyst::{
-    assets::{AssetStorage, Handle, Loader},
-    core::{timing::Time, Transform},
-    ecs::{
-        prelude::*,
-        world::{EntitiesRes, Index},
-    },
-    prelude::*,
-    renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
-    shred::DynamicSystemData,
-    shrev::EventChannel,
-    ui::{Anchor, TtfFormat, UiText, UiTransform},
-};
-use nalgebra::{Isometry2, Isometry3, Translation2, Translation3, UnitComplex, Vector2, Vector3};
+use amethyst::ecs::prelude::*;
+use nalgebra::Vector2;
 use ncollide2d::{
     pipeline::{CollisionGroups, GeometricQueryType},
     shape::{Cuboid, ShapeHandle},

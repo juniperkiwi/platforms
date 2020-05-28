@@ -1,22 +1,11 @@
-use super::prelude::IsometryExt;
-
-use amethyst::{
-    core::{timing::Time, SystemDesc, Transform},
-    derive::SystemDesc,
-    ecs::prelude::*,
-    input::{InputHandler, StringBindings},
-};
-
-use nalgebra::{Isometry2, Translation2, Unit, Vector2, Vector3};
+use nalgebra::{Isometry2, Unit, Vector2};
 use ncollide2d::{
-    bounding_volume::bounding_volume::BoundingVolume,
-    pipeline::{
-        narrow_phase::ContactAlgorithm, object::CollisionObjectSlabHandle, CollisionObject,
-        CollisionWorld,
-    },
-    query::{Contact, ContactManifold},
+    pipeline::{object::CollisionObjectSlabHandle, CollisionObject, CollisionWorld},
+    query::Contact,
     shape::Shape,
 };
+
+use super::prelude::IsometryExt;
 
 const DIRECTION_TEST_DELTA: f32 = 0.001;
 

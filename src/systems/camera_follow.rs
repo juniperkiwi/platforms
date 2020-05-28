@@ -1,11 +1,9 @@
-use alga::linear::AffineTransformation;
 use amethyst::{
-    core::{timing::Time, SystemDesc, Transform},
+    core::{timing::Time, Transform},
     derive::SystemDesc,
     ecs::prelude::*,
-    input::{InputHandler, StringBindings},
 };
-use nalgebra::{Isometry2, Translation2, Unit, UnitQuaternion, Vector2, Vector3};
+use nalgebra::{UnitQuaternion, Vector3};
 
 use crate::world::*;
 

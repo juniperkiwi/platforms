@@ -1,17 +1,7 @@
-use amethyst::{
-    core::{timing::Time, SystemDesc, Transform},
-    derive::SystemDesc,
-    ecs::prelude::*,
-    input::{InputHandler, StringBindings},
-};
+use amethyst::ecs::prelude::*;
 use ncollide2d::{
-    bounding_volume::bounding_volume::BoundingVolume,
-    pipeline::{
-        narrow_phase::ContactAlgorithm, object::CollisionObjectSlabHandle, CollisionGroups,
-        CollisionObject, CollisionWorld, GeometricQueryType,
-    },
-    query::{Contact, ContactManifold},
-    shape::{Shape, ShapeHandle},
+    pipeline::{object::CollisionObjectSlabHandle, CollisionGroups, GeometricQueryType},
+    shape::ShapeHandle,
 };
 use specs_derive::Component;
 
