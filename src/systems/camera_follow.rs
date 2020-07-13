@@ -8,10 +8,12 @@ use nalgebra::{UnitQuaternion, Vector3};
 use crate::world::*;
 
 #[derive(Default)]
-pub struct TrackingCamera;
+pub struct TrackingCamera {
+    started_tracking: bool,
+}
 
 impl Component for TrackingCamera {
-    type Storage = NullStorage<Self>;
+    type Storage = DenseVecStorage<Self>;
 }
 
 #[derive(Clone)]
@@ -53,14 +55,21 @@ impl<'s> System<'s> for CameraTrackTargetSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
         WriteStorage<'s, CameraVelocity>,
-        ReadStorage<'s, TrackingCamera>,
+        WriteStorage<'s, TrackingCamera>,
         ReadStorage<'s, CameraTarget>,
         Read<'s, Time>,
         ReadExpect<'s, ConstantsConfig>,
     );
     fn run(
         &mut self,
-        (mut transforms, mut camera_velocities, tracking_cameras, camera_targets, time, constants): Self::SystemData,
+        (
+            mut transforms,
+            mut camera_velocities,
+            mut tracking_cameras,
+            camera_targets,
+            time,
+            constants,
+        ): Self::SystemData,
     ) {
         let constants = &constants.camera_follow;
         let mut target_data = None;
@@ -77,13 +86,20 @@ impl<'s> System<'s> for CameraTrackTargetSystem {
             (*transform.translation(), targeting_info.target_rotation)
         };
 
-        for (transform, velocity, _) in (
+        for (transform, velocity, tracking) in (
             &mut transforms,
             (&mut camera_velocities).maybe(),
-            &tracking_cameras,
+            &mut tracking_cameras,
         )
             .join()
         {
+            // Initialize camera at target.
+            if !tracking.started_tracking {
+                transform.set_translation(target_translation);
+                transform.set_rotation(target_rotation);
+                tracking.started_tracking = true;
+                continue;
+            }
             match velocity {
                 Some(velocity) => {
                     // Credit for the algorithm here to

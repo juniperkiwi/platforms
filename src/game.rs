@@ -35,7 +35,7 @@ fn initialize_camera(world: &mut World) {
         .with(Camera::standard_2d(ARENA_WIDTH, ARENA_HEIGHT))
         .with(transform)
         .with(CameraVelocity::default())
-        .with(TrackingCamera)
+        .with(TrackingCamera::default())
         .build();
 }
 
