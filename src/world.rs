@@ -10,6 +10,7 @@ use crate::{
     collisions::components::{CollisionPresence, HasGravity},
     systems::{CameraFollowConstants, PlayerMovementConstants},
 };
+use std::path::PathBuf;
 
 const PLATFORM_COLLISION_GROUP: usize = 1;
 const PLAYER_COLLISION_GROUP: usize = 2;
@@ -22,6 +23,11 @@ pub struct ConstantsConfig {
     pub player: PlayerMovementConstants,
     pub gravity_accel: f32,
     pub camera_follow: CameraFollowConstants,
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct MapsConfig {
+    pub default: PathBuf,
 }
 
 #[derive(Copy, Clone, Default, Component)]

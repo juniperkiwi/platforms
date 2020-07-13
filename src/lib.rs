@@ -16,9 +16,11 @@ mod audio;
 mod collisions;
 mod game;
 mod systems;
+mod tiles;
 mod world;
 
 use crate::{game::Game, world::ConstantsConfig};
+use world::MapsConfig;
 
 pub fn run() -> amethyst::Result<()> {
     let app_root = application_root_dir()?;
@@ -26,6 +28,7 @@ pub fn run() -> amethyst::Result<()> {
     let display_config_path = config.join("display.ron");
     let bindings_path = config.join("bindings.ron");
     let constants_path = config.join("constants.ron");
+    let maps_path = config.join("maps.ron");
 
     let input_bundle =
         InputBundle::<StringBindings>::new().with_bindings_from_file(bindings_path)?;
@@ -97,6 +100,7 @@ pub fn run() -> amethyst::Result<()> {
     let assets_dir = app_root.join("assets");
     let mut game = Application::build(assets_dir, Game::default())?
         .with_resource(ConstantsConfig::load(constants_path)?)
+        .with_resource(MapsConfig::load(maps_path)?)
         .build(game_data)?;
     game.run();
 

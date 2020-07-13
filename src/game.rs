@@ -246,11 +246,15 @@ impl SimpleState for Game {
 
         let sprite_sheet = load_sprite_sheet(world);
 
+        world.register::<world::Player>();
+        world.register::<world::Platform>();
+
         initialize_camera(world);
         // initialize_scoreboard(world);
         // initialize_audio(world);
-        initialize_platforms(world, sprite_sheet.clone());
-        initialize_player(world, sprite_sheet.clone());
+        // initialize_platforms(world, sprite_sheet.clone());
+        // initialize_player(world, sprite_sheet.clone());
+        crate::tiles::initialize_tiles(world, sprite_sheet.clone());
 
         self.sprite_sheet.replace(sprite_sheet);
 

@@ -1,10 +1,8 @@
 (
   axes: {
-    "left_paddle": Emulated(pos: Key(W), neg: Key(S)),
-    "right_paddle": Emulated(pos: Key(Up), neg: Key(Down)),
     "left_right": Emulated(neg: Key(A), pos: Key(D)),
   },
   actions: {
-    "jump": [[Key(Space)]]
+    "jump": [[Key(Space)], [Key(W)]]
   },
 )
